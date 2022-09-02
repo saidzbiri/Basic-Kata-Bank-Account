@@ -1,10 +1,10 @@
-#Author
-
-Said Z'BIRI
-
 # Basic Kata Bank Account
 
 This project was created with Spring Boot, use an embedded database (h2) and Swagger.
+
+## Author
+
+Said Z'BIRI
 
 ## Getting Started
 
