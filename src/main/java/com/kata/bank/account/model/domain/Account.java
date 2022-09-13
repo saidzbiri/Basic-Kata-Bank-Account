@@ -1,4 +1,4 @@
-package com.kata.bank.account.model;
+package com.kata.bank.account.model.domain;
 
 import java.util.Date;
 
@@ -10,30 +10,34 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
 
 @Entity
+@Data
+@Builder
+@AllArgsConstructor
 public class Account {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@JsonIgnore
 	@Column(name = "account_id")
 	private Long accountId;
+	
 	@Column(name = "account_number", unique = true, nullable = false)
 	private Long accountNumber;
-	@JsonIgnore
+	
 	@Column(name = "creation_date")
 	private Date dateCreation;
-	@JsonIgnore
+	
 	@Column(name = "account_balance")
 	private double balance;
+	
 	@OneToOne
-	@JsonIgnore
 	@JoinColumn(name = "client_id")
 	private Client client;
-	
 	
 	public Account() {
 		super();
@@ -44,77 +48,15 @@ public class Account {
 		this.accountNumber = accountNumber;
 		this.client = client;
 		this.dateCreation = new Date();
-		this.balance = 0d;	
 	}
 	
-	public Account deposit(double operationAmount) {
-		this.balance += operationAmount;
-		return this;
-	}
-	
-	public Account withdrawal(double operationAmount) {
-		this.balance -= operationAmount;
-		return this;
-	}
-
-
-	public Long getAccountId() {
-		return accountId;
-	}
-
-
-	public Long getAccountNumber() {
-		return accountNumber;
-	}
-
-
-	public void setAccountNumber(Long accountNumber) {
+	public Account(Long accountNumber, double balance, Client client) {
+		super();
 		this.accountNumber = accountNumber;
-	}
-
-
-	public Date getDateCreation() {
-		return dateCreation;
-	}
-
-
-	public void setDateCreation(Date dateCreation) {
-		this.dateCreation = dateCreation;
-	}
-
-
-	public double getBalance() {
-		return balance;
-	}
-
-
-	public void setBalance(double balance) {
 		this.balance = balance;
-	}
-
-
-	public Client getClient() {
-		return client;
-	}
-
-
-	public void setClient(Client client) {
 		this.client = client;
+		this.dateCreation = new Date();
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
-	
-
-
-
 
 	
 	

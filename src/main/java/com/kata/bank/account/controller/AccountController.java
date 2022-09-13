@@ -1,18 +1,20 @@
 package com.kata.bank.account.controller;
 
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kata.bank.account.exception.AccountNotFoundException;
 import com.kata.bank.account.mapper.Mapper;
-import com.kata.bank.account.model.Account;
-import com.kata.bank.account.model.AccountDTO;
+import com.kata.bank.account.model.domain.Account;
+import com.kata.bank.account.model.dto.AccountDto;
 import com.kata.bank.account.service.AccountService;
+
+import io.swagger.annotations.ApiOperation;
+
 
 @RestController
 @RequestMapping("/accounts")
@@ -24,14 +26,11 @@ public class AccountController {
 	@Autowired
 	private Mapper mapper;
 	
+	@ApiOperation("returns details of an account")
 	@GetMapping("/{accountNumber}")
-	public AccountDTO printAccountStatement(@PathVariable Long accountNumber) throws AccountNotFoundException {
-
-        Optional<Account> optionalAccount = accountService.getAccount(accountNumber);
-        if (! optionalAccount.isPresent()) {
-            throw new AccountNotFoundException(String.valueOf(accountNumber));
-        }
-        return mapper.toAccountDTO(optionalAccount.get());
+	public ResponseEntity<AccountDto> printAccountStatement(@PathVariable Long accountNumber) {		
+		Account account = accountService.findByAccountNumber(accountNumber);
+		return ResponseEntity.ok().body(mapper.toAccountDto(account));
 	}
 
 }

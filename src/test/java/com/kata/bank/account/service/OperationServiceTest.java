@@ -2,21 +2,27 @@ package com.kata.bank.account.service;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
+import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.kata.bank.account.model.Account;
-import com.kata.bank.account.model.Client;
-import com.kata.bank.account.model.Operation;
+import com.kata.bank.account.exception.InsufficientFundException;
+import com.kata.bank.account.exception.OperationTypeNotSupportedException;
+import com.kata.bank.account.mapper.Mapper;
+import com.kata.bank.account.model.domain.Account;
+import com.kata.bank.account.model.domain.Client;
+import com.kata.bank.account.model.domain.Operation;
+import com.kata.bank.account.model.dto.OperationCreationDto;
 import com.kata.bank.account.repository.OperationRepository;
 import com.kata.bank.account.service.impl.OperationServiceImpl;
 
@@ -27,26 +33,81 @@ public class OperationServiceTest {
 	@Mock
 	private OperationRepository operationRepository;
 	
+	@Mock
+	private AccountService accountService;
+	
+	@Spy
+	private Mapper mapper;
+	
 	@InjectMocks
 	private OperationService operationService = new OperationServiceImpl();
 	
-	private Client client = new Client(4545L, "test", "test", "test@gmail.com");
-    private Account account = new Account(120L, client);
+	private Client client = new Client(4545L, "said", "zbiri", "said@gmail.com");
+
+	private static Long ACCOUNT_NUMBER = 1001L;
+	private static double WITHDRAWAL_AMOUNT = 100d;
+	private static double ACCOUNT_BALANCE = 0d;
+	private static String UNKKNOWN_OPERATION_TYPE = "Clearing of Cheques";
     
     @Before
     public void setUp() {
 		System.out.println("--------------> OperationServiceTest <--------------");
     }
 	
-	@Test
-	public void testRegisterOperation() {
-		Operation operation = new Operation("withdrawal", 200d, account);
-		
-		when(operationRepository.save(any())).thenReturn(operation);	
-        Operation insertedOperation = operationService.registerOperation(operation);
-        
-        assertThat(insertedOperation, is(operation));
+	
 
-	}
+    @Test
+    public void should_save_operation() {
+    	OperationCreationDto operationRequest = new OperationCreationDto(1001L, "deposit", 50d);
+        Account account = new Account(1001L, 0L, client);
+        
+        Operation expectedOperation = Operation.builder()
+									   .operationType("deposit")
+									   .amount(50d)
+									   .date(new Date())
+									   .account(account)
+									   .build();
+        
+        when(accountService.findByAccountNumber(ACCOUNT_NUMBER))
+				.thenReturn(account);
+
+        when(mapper.toOperation(operationRequest, account))
+        		.thenReturn(expectedOperation);
+        
+        doReturn(null)
+                .when(accountService)
+                .saveAccount(account);
+               
+        when(operationRepository.save(Mockito.any(Operation.class)))
+                .thenReturn(expectedOperation);
+                       
+
+        Operation insertedOperation = operationService.save(operationRequest);
+        assertThat(insertedOperation, is(expectedOperation));
+    }
+    
+    
+    @Test(expected = InsufficientFundException.class)
+    public void should_throw_insufficient_fund_when_trying_to_withdraw_amount_greater_than_account_balance() {
+    	OperationCreationDto operationRequest = new OperationCreationDto(1001L, "withdrawal", WITHDRAWAL_AMOUNT);	
+        Account account = new Account(1001L, ACCOUNT_BALANCE, client);
+        
+        when(accountService.findByAccountNumber(ACCOUNT_NUMBER))
+				.thenReturn(account);
+        
+        operationService.save(operationRequest);
+    }
+    
+    
+    @Test(expected = OperationTypeNotSupportedException.class)
+    public void should_throw_operation_type_not_supported_when_trying_to_execute_operation_of_unknown_type() {
+    	OperationCreationDto operationRequest = new OperationCreationDto(1001L, UNKKNOWN_OPERATION_TYPE, 50d);	
+    	Account account = new Account(1001L, 0d, client);
+    	
+    	when(accountService.findByAccountNumber(ACCOUNT_NUMBER))
+    	.thenReturn(account);
+    	
+    	operationService.save(operationRequest);
+    }
 
 }

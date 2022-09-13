@@ -1,33 +1,77 @@
 package com.kata.bank.account.service.impl;
 
-import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.kata.bank.account.model.Account;
-import com.kata.bank.account.model.Operation;
+import com.google.common.collect.Sets;
+import com.kata.bank.account.exception.InsufficientFundException;
+import com.kata.bank.account.exception.OperationTypeNotSupportedException;
+import com.kata.bank.account.mapper.Mapper;
+import com.kata.bank.account.model.domain.Account;
+import com.kata.bank.account.model.domain.Operation;
+import com.kata.bank.account.model.domain.TypeOperation;
+import com.kata.bank.account.model.dto.OperationCreationDto;
 import com.kata.bank.account.repository.OperationRepository;
+import com.kata.bank.account.service.AccountService;
 import com.kata.bank.account.service.OperationService;
 
 @Service
 public class OperationServiceImpl implements OperationService {
 	
+	private static final Set<String> OPERATIONS_TYPES = Sets.newHashSet("WITHDRAWAL", "DEPOSIT");
+	
 	@Autowired
 	private OperationRepository operationRepository;
-
-	@Override
-	public Operation registerOperation(Operation newOperation) {
-		return operationRepository.save(newOperation);
-	}
+	
+	@Autowired
+	private AccountService accountService;
+	
+	@Autowired
+	private Mapper mapper;
 
 	
 	@Override
-	public List<Operation> getAllOperationForAccount(Account account, int page, int size) {
-		PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC,"date"));
-        return operationRepository.findByAccount(account, pageRequest);
+	public Page<Operation> findAllOperationsForAClient(Long accountNumber, Pageable pageable) {
+
+		Account account = accountService.findByAccountNumber(accountNumber);
+				 
+		return operationRepository.findByAccount(account, pageable);
+	}
+
+
+	@Override
+	public Operation save(OperationCreationDto operationRequest) {
+		Long accountNumber = operationRequest.getAccountNumber();
+		double operationAmount = operationRequest.getAmount();
+		String operationType = operationRequest.getOperationType();
+		
+		Account account = accountService.findByAccountNumber(accountNumber);
+		
+		if ( !OPERATIONS_TYPES.contains(operationType.toUpperCase()) ) {
+			throw new OperationTypeNotSupportedException(operationType);
+		}
+		
+		if ( TypeOperation.WITHDRAWAL.toString().equalsIgnoreCase(operationType) ) {
+			if ( operationAmount > account.getBalance() ) {
+				throw new InsufficientFundException(String.valueOf(accountNumber));
+			}
+			account.setBalance(account.getBalance() - operationAmount);
+			
+		} 
+		
+		if ( TypeOperation.DEPOSIT.toString().equalsIgnoreCase(operationType) ) {
+			account.setBalance(account.getBalance() + operationAmount);
+		}
+		
+		Operation operation = mapper.toOperation(operationRequest, account);
+		accountService.saveAccount(account);
+
+		return operationRepository.save(operation);
+		
 	}
 
 }

@@ -1,6 +1,6 @@
 package com.kata.bank.account.service;
 
-import com.kata.bank.account.model.Client;
+import com.kata.bank.account.model.domain.Client;
 
 public interface ClientService {
 	

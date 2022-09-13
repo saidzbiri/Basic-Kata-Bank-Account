@@ -1,31 +1,50 @@
 package com.kata.bank.account.mapper;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.kata.bank.account.model.AccountDTO;
-import com.kata.bank.account.model.Account;
-import com.kata.bank.account.model.Operation;
-import com.kata.bank.account.model.OperationDTO;
+import java.util.Date;
+import java.util.Objects;
+
+import com.kata.bank.account.model.domain.Account;
+import com.kata.bank.account.model.domain.Operation;
+import com.kata.bank.account.model.dto.AccountDto;
+import com.kata.bank.account.model.dto.OperationCreationDto;
+import com.kata.bank.account.model.dto.OperationDto;
 
 @Component
 public class Mapper {
 
-    public OperationDTO toOperationDto(Operation operation) {
-        return new OperationDTO(operation.getOperationType(), operation.getAmount(), operation.getDate());
+    public OperationDto toOperationDto(Operation operation) {
+    	if(Objects.isNull(operation)){
+            return null;
+        }
+        return OperationDto.builder()
+        		.id(operation.getOperationId())
+        		.operationType(operation.getOperationType())
+        		.amount(operation.getAmount())
+        		.operationDate(operation.getDate())
+                .build();
     }
     
-    public List<OperationDTO> toOperationDtoList(List<Operation> operations) {
-    	
-    	return operations
-    			.stream()
-    			.map(operation -> new OperationDTO(operation.getOperationType(), operation.getAmount(), operation.getDate()))
-    			.collect(Collectors.toList());
+    
+    public Operation toOperation(OperationCreationDto operationDto, Account account) {
+    	return Operation.builder()
+    					.operationType(operationDto.getOperationType())
+    					.amount(operationDto.getAmount())
+    					.date(new Date())
+    					.account(account)
+    					.build();
     }
-
-	public com.kata.bank.account.model.AccountDTO toAccountDTO(Account account) {
-		return new AccountDTO(account.getAccountNumber(), account.getDateCreation(), account.getBalance());
+    
+	public AccountDto toAccountDto(Account account) {
+		if(Objects.isNull(account)){
+            return null;
+        }
+        return AccountDto.builder()
+                .accountNumber(account.getAccountNumber())
+                .dateCreation(account.getDateCreation())
+                .balance(account.getBalance())
+                .build();
 	}
 }

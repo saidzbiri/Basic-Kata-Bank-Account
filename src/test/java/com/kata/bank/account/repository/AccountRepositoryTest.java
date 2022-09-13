@@ -16,9 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.kata.bank.account.Application;
-import com.kata.bank.account.exception.AccountNotFoundException;
-import com.kata.bank.account.model.Account;
-import com.kata.bank.account.model.Client;
+import com.kata.bank.account.model.domain.Account;
+import com.kata.bank.account.model.domain.Client;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { Application.class })
@@ -37,8 +36,10 @@ public class AccountRepositoryTest {
 	public void setUp() {
 		if (!initialized) {
 			System.out.println("--------------> AccountRepositoryTest <--------------");
+			
 	        Client client = new Client(1234L, "said", "zbiri", "test@gmail.com");
 	        Account account = new Account(111L, client);
+	        
 	        clientRepository.save(client);
 	        accountRepository.save(account);
 		    initialized = true;
@@ -46,20 +47,14 @@ public class AccountRepositoryTest {
     }
 
 	@Test
-	public void testGetAccountByAccountNumberPositive() {
-		assertTrue(accountRepository.getAccountByAccountNumber(111L).isPresent());
+	public void should_get_account_for_a_known_account_number() {
+		assertTrue(accountRepository.findByAccountNumber(111L).isPresent());
 	}
 	
+		
 	@Test
-	public void testGetAccountByAccountNumberNegative() {
-		assertThat(accountRepository.getAccountByAccountNumber(222L), is(Optional.empty()));
-	}
-	
-	@Test(expected = AccountNotFoundException.class)
-	public void testGetAccountByAccountNumberNegative2() throws AccountNotFoundException {		
-		if (!accountRepository.getAccountByAccountNumber(Long.valueOf(222)).isPresent()) {
-            throw new AccountNotFoundException(String.valueOf(222));
-        }
+	public void should_throw_error_for_an_unknown_account() {	
+		assertThat(accountRepository.findByAccountNumber(123456L), is(Optional.empty()));
 	}
 	
 }

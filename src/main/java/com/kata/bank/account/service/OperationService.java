@@ -1,17 +1,20 @@
 package com.kata.bank.account.service;
 
-import java.util.List;
 
-import com.kata.bank.account.model.Account;
-import com.kata.bank.account.model.Operation;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import com.kata.bank.account.model.domain.Operation;
+import com.kata.bank.account.model.dto.OperationCreationDto;
 
 
 
 public interface OperationService {
-	
-	Operation registerOperation(Operation newOperationRequest);
-	
-	List<Operation> getAllOperationForAccount(Account account, int page, int size);
+
+	Page<Operation> findAllOperationsForAClient(Long accountNumber, Pageable pageable);
+
+	Operation save(OperationCreationDto newOperation);
 	
 
 }
