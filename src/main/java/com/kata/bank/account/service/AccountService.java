@@ -1,6 +1,8 @@
 package com.kata.bank.account.service;
 
 
+import java.util.Optional;
+
 import com.kata.bank.account.model.domain.Account;
 
 public interface AccountService {
@@ -8,7 +10,7 @@ public interface AccountService {
 		
 	public Account saveAccount(Account account);
     	
-	Account findByAccountNumber(Long accountNumber);
+	Optional<Account> findByAccountNumber(Long accountNumber);
 
 
 }

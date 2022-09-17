@@ -56,7 +56,7 @@ public class OperationController {
 	public ResponseEntity<OperationDto> executeOperation(@RequestBody @Valid OperationCreationDto operationRequest) {
 		log.info("executeOperation() operationRequest: {}", operationRequest);
 		
-		OperationDto operationDto = mapper.toOperationDto(operationService.save(operationRequest));
+		OperationDto operationDto = mapper.toOperationDto(operationService.executeOperation(operationRequest));
 		final URI location = ServletUriComponentsBuilder.fromCurrentServletMapping().path("/{id}").build().expand(operationDto.getId()).toUri();
 		
 		return ResponseEntity.created(location).body(operationDto);
@@ -64,7 +64,7 @@ public class OperationController {
 	
 	@ApiOperation("search all operations of an account")
     @GetMapping
-    public ResponseEntity<PagedResources<OperationResource>> getAllOperationForAClient(
+    public ResponseEntity<PagedResources<OperationResource>> getAllOperationByAccount(
                                                     @RequestParam(value = "accountNumber", required = true) Long accountNumber,
                                                     @PageableDefault(page = 0, size = 10, sort = "date", direction = Direction.DESC) Pageable pageable,
                                                     PagedResourcesAssembler<OperationDto> pagedAssembler
@@ -72,7 +72,7 @@ public class OperationController {
 		
 		log.info("getAllOperationForAClient() accountNumber: {}", accountNumber);
 		    	
-    	Page<Operation> operationsHistory = operationService.findAllOperationsForAClient(accountNumber, pageable);
+    	Page<Operation> operationsHistory = operationService.findAllOperationsByAccount(accountNumber, pageable);
     	Page<OperationDto> operationsDto = operationsHistory.map(mapper::toOperationDto);	
     	    	 
     	PagedResources<OperationResource>  resources = pagedAssembler.toResource(operationsDto, assembler);
@@ -84,8 +84,7 @@ public class OperationController {
     @GetMapping("/{operationId}")
     public ResponseEntity<OperationResource> getOperationInfo(@PathVariable("operationId") final int operationId) {
     	log.info("getOperationInfo() operationId: {}", operationId);
-    	// Not implemented yet
-        return null;
+    	throw new UnsupportedOperationException();
     }
 	
 

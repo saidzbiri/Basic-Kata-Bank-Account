@@ -44,13 +44,14 @@ public class AccountServiceTest {
 	@Test
 	public void should_get_account_for_account_number() {
 		when(accountRepository.findByAccountNumber(ACCOUNT_NUMBER)).thenReturn(Optional.of(account));
-		assertThat(accountService.findByAccountNumber(ACCOUNT_NUMBER), is(account));
+		assertThat(accountService.findByAccountNumber(ACCOUNT_NUMBER), is(Optional.of(account)));
 	}
 	
     @Test(expected = AccountNotFoundException.class)
     public void should_throw_account_not_found_when_trying_to_get_account_for_unknown_account_number() throws AccountNotFoundException {
         when(accountRepository.findByAccountNumber(ACCOUNT_NUMBER)).thenReturn(Optional.empty());
-        accountService.findByAccountNumber(ACCOUNT_NUMBER);
+        accountService.findByAccountNumber(ACCOUNT_NUMBER)
+		  .orElseThrow(() -> new AccountNotFoundException(String.valueOf(ACCOUNT_NUMBER)));
     }
 
 }

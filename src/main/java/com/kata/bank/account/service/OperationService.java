@@ -12,9 +12,9 @@ import com.kata.bank.account.model.dto.OperationCreationDto;
 
 public interface OperationService {
 
-	Page<Operation> findAllOperationsForAClient(Long accountNumber, Pageable pageable);
+	Page<Operation> findAllOperationsByAccount(Long accountNumber, Pageable pageable);
 
-	Operation save(OperationCreationDto newOperation);
+	Operation executeOperation(OperationCreationDto newOperation);
 	
 
 }

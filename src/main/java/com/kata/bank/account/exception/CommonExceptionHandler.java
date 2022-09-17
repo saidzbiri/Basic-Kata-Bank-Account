@@ -12,6 +12,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -20,35 +21,23 @@ import com.kata.bank.account.model.dto.ErrorDto;
 
 import lombok.extern.slf4j.Slf4j;
 
+import static org.springframework.http.HttpStatus.*;
+
 
 @Slf4j
 @ControllerAdvice
 public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
 	
 	
-	@ExceptionHandler(AccountNotFoundException.class)
-	public ResponseEntity<Object> handleAccountNotFoundException(AccountNotFoundException ex, WebRequest request) {
-		
-		ErrorDto errorDto = buildErrorDto(ex, request, HttpStatus.NOT_FOUND.value(), null);       
-        return new ResponseEntity<>(errorDto, HttpStatus.NOT_FOUND);
-	}
-	
-	
-	@ExceptionHandler(OperationTypeNotSupportedException.class)
-	public ResponseEntity<Object> handleOperationTypeNotSupportedException(OperationTypeNotSupportedException ex, WebRequest request) {
-		
-		ErrorDto errorDto = buildErrorDto(ex, request, HttpStatus.BAD_REQUEST.value(), null);					
-		return ResponseEntity.badRequest().body(errorDto);
-	}
-	
-	
-	@ExceptionHandler(InsufficientFundException.class)
-	public ResponseEntity<Object> handleInsufficientFundException(InsufficientFundException ex, WebRequest request) {
-		
-		ErrorDto errorDto = buildErrorDto(ex, request, HttpStatus.NOT_FOUND.value(), null);	
-		return new ResponseEntity<>(errorDto, HttpStatus.NOT_FOUND);
-	}
-	
+    @ExceptionHandler(ResourceAccessException.class)
+    public ResponseEntity<Object> handleResourceAccessException(ResourceAccessException ex, WebRequest request) {
+        return new ResponseEntity<>(buildErrorDto(ex, request, NOT_FOUND), NOT_FOUND);
+    }
+    
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Object> handleIllegalStateException(IllegalStateException ex, WebRequest request) {
+    	return new ResponseEntity<>(buildErrorDto(ex, request, BAD_REQUEST), BAD_REQUEST);
+    }
 
     @Override
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
@@ -62,23 +51,30 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
             errors.add(error.getObjectName() + ": " + error.getDefaultMessage());
         }
 
-        ErrorDto errorDto = buildErrorDto(ex, request, HttpStatus.BAD_REQUEST.value(), errors);
+        ErrorDto errorDto = buildErrorDto(ex, request, BAD_REQUEST, errors);
         
-        		
         return new ResponseEntity<>(errorDto, HttpStatus.BAD_REQUEST);
     }
     
 
-	private ErrorDto buildErrorDto(Exception ex, WebRequest request, int code, List<String> errors) {
-		List<String> erreurs = (errors == null) ? new ArrayList<String>() : errors;
-		
+	private ErrorDto buildErrorDto(Exception ex, WebRequest request, HttpStatus status) {
 		String url = ((ServletWebRequest) request).getRequest().getRequestURL().toString();
 		return ErrorDto.builder()
-				.status(code)
+				.status(status.value())
 				.date(LocalDateTime.now())
 				.url(url)
 				.message(ex.getMessage())
-				.errors(erreurs)
+				.build();
+	}
+	
+	private ErrorDto buildErrorDto(Exception ex, WebRequest request, HttpStatus status, List<String> errors) {
+		String url = ((ServletWebRequest) request).getRequest().getRequestURL().toString();
+		return ErrorDto.builder()
+				.status(status.value())
+				.date(LocalDateTime.now())
+				.url(url)
+				.message(ex.getMessage())
+				.errors(errors)
 				.build();
 	}
 

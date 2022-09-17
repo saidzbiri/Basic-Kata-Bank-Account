@@ -1,6 +1,8 @@
 package com.kata.bank.account.controller;
 
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,8 +31,9 @@ public class AccountController {
 	@ApiOperation("returns details of an account")
 	@GetMapping("/{accountNumber}")
 	public ResponseEntity<AccountDto> printAccountStatement(@PathVariable Long accountNumber) {		
-		Account account = accountService.findByAccountNumber(accountNumber);
-		return ResponseEntity.ok().body(mapper.toAccountDto(account));
+		Optional<Account> optionalAccount = accountService.findByAccountNumber(accountNumber);
+		
+		return optionalAccount.map(account -> ResponseEntity.ok().body(mapper.toAccountDto(account))).orElseGet(() -> ResponseEntity.notFound().build());
 	}
 
 }

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Sets;
+import com.kata.bank.account.exception.AccountNotFoundException;
 import com.kata.bank.account.exception.InsufficientFundException;
 import com.kata.bank.account.exception.OperationTypeNotSupportedException;
 import com.kata.bank.account.mapper.Mapper;
@@ -35,27 +36,25 @@ public class OperationServiceImpl implements OperationService {
 
 	
 	@Override
-	public Page<Operation> findAllOperationsForAClient(Long accountNumber, Pageable pageable) {
-
-		Account account = accountService.findByAccountNumber(accountNumber);
-				 
-		return operationRepository.findByAccount(account, pageable);
+	public Page<Operation> findAllOperationsByAccount(Long accountNumber, Pageable pageable) {
+		return operationRepository.findByAccount_AccountNumber(accountNumber, pageable);
 	}
 
 
 	@Override
-	public Operation save(OperationCreationDto operationRequest) {
+	public Operation executeOperation(OperationCreationDto operationRequest) {
 		Long accountNumber = operationRequest.getAccountNumber();
 		double operationAmount = operationRequest.getAmount();
 		String operationType = operationRequest.getOperationType();
 		
-		Account account = accountService.findByAccountNumber(accountNumber);
+		Account account = accountService.findByAccountNumber(accountNumber)
+										.orElseThrow(() -> new AccountNotFoundException(String.valueOf(accountNumber)));
 		
 		if ( !OPERATIONS_TYPES.contains(operationType.toUpperCase()) ) {
 			throw new OperationTypeNotSupportedException(operationType);
 		}
 		
-		if ( TypeOperation.WITHDRAWAL.toString().equalsIgnoreCase(operationType) ) {
+		if ( TypeOperation.WITHDRAWAL.name().equalsIgnoreCase(operationType) ) {
 			if ( operationAmount > account.getBalance() ) {
 				throw new InsufficientFundException(String.valueOf(accountNumber));
 			}
@@ -63,7 +62,7 @@ public class OperationServiceImpl implements OperationService {
 			
 		} 
 		
-		if ( TypeOperation.DEPOSIT.toString().equalsIgnoreCase(operationType) ) {
+		if ( TypeOperation.DEPOSIT.name().equalsIgnoreCase(operationType) ) {
 			account.setBalance(account.getBalance() + operationAmount);
 		}
 		

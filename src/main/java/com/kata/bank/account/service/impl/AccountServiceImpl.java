@@ -1,9 +1,10 @@
 package com.kata.bank.account.service.impl;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.kata.bank.account.exception.AccountNotFoundException;
 import com.kata.bank.account.model.domain.Account;
 import com.kata.bank.account.repository.AccountRepository;
 import com.kata.bank.account.service.AccountService;
@@ -22,12 +23,11 @@ public class AccountServiceImpl implements AccountService {
     }
 
 	@Override
-	public Account findByAccountNumber(Long accountNumber) {
-		return accountRepository.findByAccountNumber(accountNumber)
-				.orElseThrow(() -> new AccountNotFoundException(String.valueOf(accountNumber)));
+	public Optional<Account> findByAccountNumber(Long accountNumber) {
+		return accountRepository.findByAccountNumber(accountNumber);
 	}
 
 
 
-
+	
 }
