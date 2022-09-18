@@ -1,6 +1,5 @@
 package com.kata.bank.account.controller;
 
-
 import java.net.URI;
 
 import javax.validation.Valid;
@@ -34,58 +33,55 @@ import com.kata.bank.account.service.OperationService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 
-
-
 @Slf4j
 @Validated
 @RestController
 @RequestMapping("/operations")
 public class OperationController {
-	
+
 	@Autowired
 	private OperationService operationService;
-			
+
 	@Autowired
 	private Mapper mapper;
-	
+
 	@Autowired
 	OperationResourceAssembler assembler;
-	
+
 	@ApiOperation("create new operation")
 	@PostMapping
 	public ResponseEntity<OperationDto> executeOperation(@RequestBody @Valid OperationCreationDto operationRequest) {
 		log.info("executeOperation() operationRequest: {}", operationRequest);
-		
+
 		OperationDto operationDto = mapper.toOperationDto(operationService.executeOperation(operationRequest));
-		final URI location = ServletUriComponentsBuilder.fromCurrentServletMapping().path("/{id}").build().expand(operationDto.getId()).toUri();
-		
+		final URI location = ServletUriComponentsBuilder.fromCurrentServletMapping().path("/{id}").build()
+				.expand(operationDto.getId()).toUri();
+
 		return ResponseEntity.created(location).body(operationDto);
 	}
-	
+
 	@ApiOperation("search all operations of an account")
-    @GetMapping
-    public ResponseEntity<PagedResources<OperationResource>> getAllOperationByAccount(
-                                                    @RequestParam(value = "accountNumber", required = true) Long accountNumber,
-                                                    @PageableDefault(page = 0, size = 10, sort = "date", direction = Direction.DESC) Pageable pageable,
-                                                    PagedResourcesAssembler<OperationDto> pagedAssembler
-    												) {
-		
+	@GetMapping
+	public ResponseEntity<PagedResources<OperationResource>> getAllOperationByAccount(
+			@RequestParam(value = "accountNumber", required = true) Long accountNumber,
+			@PageableDefault(page = 0, size = 10, sort = "date", direction = Direction.DESC) Pageable pageable,
+			PagedResourcesAssembler<OperationDto> pagedAssembler) {
+
 		log.info("getAllOperationForAClient() accountNumber: {}", accountNumber);
-		    	
-    	Page<Operation> operationsHistory = operationService.findAllOperationsByAccount(accountNumber, pageable);
-    	Page<OperationDto> operationsDto = operationsHistory.map(mapper::toOperationDto);	
-    	    	 
-    	PagedResources<OperationResource>  resources = pagedAssembler.toResource(operationsDto, assembler);
-                  
-        return ResponseEntity.ok().body(resources);
-    }
+
+		Page<Operation> operationsHistory = operationService.findAllOperationsByAccount(accountNumber, pageable);
+		Page<OperationDto> operationsDto = operationsHistory.map(mapper::toOperationDto);
+
+		PagedResources<OperationResource> resources = pagedAssembler.toResource(operationsDto, assembler);
+
+		return ResponseEntity.ok().body(resources);
+	}
 
 	@ApiOperation("returns details of an operation")
-    @GetMapping("/{operationId}")
-    public ResponseEntity<OperationResource> getOperationInfo(@PathVariable("operationId") final int operationId) {
-    	log.info("getOperationInfo() operationId: {}", operationId);
-    	throw new UnsupportedOperationException();
-    }
-	
+	@GetMapping("/{operationId}")
+	public ResponseEntity<OperationResource> getOperationInfo(@PathVariable("operationId") final int operationId) {
+		log.info("getOperationInfo() operationId: {}", operationId);
+		throw new UnsupportedOperationException();
+	}
 
 }

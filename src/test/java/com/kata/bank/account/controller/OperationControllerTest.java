@@ -30,45 +30,43 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = { Application.class })
 @AutoConfigureMockMvc
 public class OperationControllerTest {
-	
-	@MockBean
+
+    @MockBean
     private OperationService operationService;
-	
-	@MockBean
+
+    @MockBean
     private AccountService accountService;
-	
 
     @Autowired
     private MockMvc mockMvc;
-    
-    
+
     private Client client = new Client(4545L, "said", "zbiri", "said@gmail.com");
     private static final Long ACCOUNT_NUMBER = 1001L;
     private static final String OPERATION_TYPE = "Deposit";
-    
+
     @Test
     public void should_execute_operation() throws Exception {
-    	Account account = new Account(ACCOUNT_NUMBER, 50L, client);
-    	OperationCreationDto operationRequest = new OperationCreationDto(ACCOUNT_NUMBER, OPERATION_TYPE, 50d);
-    	Operation expectedOperation = Operation.builder()
-											   .operationType("deposit")
-											   .amount(50d)
-											   .date(new Date())
-											   .account(account)
-											   .build();
-        
+        Account account = new Account(ACCOUNT_NUMBER, 50L, client);
+        OperationCreationDto operationRequest = new OperationCreationDto(ACCOUNT_NUMBER, OPERATION_TYPE, 50d);
+        Operation expectedOperation = Operation.builder()
+                .operationType("deposit")
+                .amount(50d)
+                .date(new Date())
+                .account(account)
+                .build();
+
         when(operationService.executeOperation(operationRequest))
                 .thenReturn(expectedOperation);
 
-        String json = JSONValue.toJSONString(operationRequest); 
-        
+        String json = JSONValue.toJSONString(operationRequest);
+
         this.mockMvc.perform(post("/operations/")
-	                .content(json)
-	                .contentType(MediaType.APPLICATION_JSON))
-	                .andDo(print())
-	                .andExpect(status().isCreated());
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isCreated());
     }
-    
+
     @Test
     public void should_not_execute_operation_with_invalid_arguments() throws Exception {
         String json = "{\"accountNumber\":\"" + ACCOUNT_NUMBER + "\"}";
@@ -79,6 +77,4 @@ public class OperationControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-
-    
 }

@@ -17,6 +17,5 @@ public class AccountDto {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
 	private Date dateCreation;
 	private double balance;
-	
 
 }

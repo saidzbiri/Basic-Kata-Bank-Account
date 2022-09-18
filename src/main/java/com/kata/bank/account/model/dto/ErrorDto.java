@@ -11,14 +11,12 @@ import lombok.Data;
 @Data
 @Builder
 public class ErrorDto {
-	
-	
+
 	private Integer status;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
 	private LocalDateTime date;
 	private String url;
 	private String message;
 	private List<String> errors;
-	
 
 }

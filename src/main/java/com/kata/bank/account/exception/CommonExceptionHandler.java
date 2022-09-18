@@ -23,24 +23,23 @@ import lombok.extern.slf4j.Slf4j;
 
 import static org.springframework.http.HttpStatus.*;
 
-
 @Slf4j
 @ControllerAdvice
 public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
-	
-	
+
     @ExceptionHandler(ResourceAccessException.class)
     public ResponseEntity<Object> handleResourceAccessException(ResourceAccessException ex, WebRequest request) {
         return new ResponseEntity<>(buildErrorDto(ex, request, NOT_FOUND), NOT_FOUND);
     }
-    
+
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<Object> handleIllegalStateException(IllegalStateException ex, WebRequest request) {
-    	return new ResponseEntity<>(buildErrorDto(ex, request, BAD_REQUEST), BAD_REQUEST);
+        return new ResponseEntity<>(buildErrorDto(ex, request, BAD_REQUEST), BAD_REQUEST);
     }
 
     @Override
-    public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers,
+            HttpStatus status, WebRequest request) {
         log.error("handleMethodArgumentNotValid() - MethodArgumentNotValidException: {}", ex.getMessage());
 
         List<String> errors = new ArrayList<>();
@@ -52,30 +51,29 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
         }
 
         ErrorDto errorDto = buildErrorDto(ex, request, BAD_REQUEST, errors);
-        
+
         return new ResponseEntity<>(errorDto, HttpStatus.BAD_REQUEST);
     }
-    
 
-	private ErrorDto buildErrorDto(Exception ex, WebRequest request, HttpStatus status) {
-		String url = ((ServletWebRequest) request).getRequest().getRequestURL().toString();
-		return ErrorDto.builder()
-				.status(status.value())
-				.date(LocalDateTime.now())
-				.url(url)
-				.message(ex.getMessage())
-				.build();
-	}
-	
-	private ErrorDto buildErrorDto(Exception ex, WebRequest request, HttpStatus status, List<String> errors) {
-		String url = ((ServletWebRequest) request).getRequest().getRequestURL().toString();
-		return ErrorDto.builder()
-				.status(status.value())
-				.date(LocalDateTime.now())
-				.url(url)
-				.message(ex.getMessage())
-				.errors(errors)
-				.build();
-	}
+    private ErrorDto buildErrorDto(Exception ex, WebRequest request, HttpStatus status) {
+        String url = ((ServletWebRequest) request).getRequest().getRequestURL().toString();
+        return ErrorDto.builder()
+                .status(status.value())
+                .date(LocalDateTime.now())
+                .url(url)
+                .message(ex.getMessage())
+                .build();
+    }
+
+    private ErrorDto buildErrorDto(Exception ex, WebRequest request, HttpStatus status, List<String> errors) {
+        String url = ((ServletWebRequest) request).getRequest().getRequestURL().toString();
+        return ErrorDto.builder()
+                .status(status.value())
+                .date(LocalDateTime.now())
+                .url(url)
+                .message(ex.getMessage())
+                .errors(errors)
+                .build();
+    }
 
 }

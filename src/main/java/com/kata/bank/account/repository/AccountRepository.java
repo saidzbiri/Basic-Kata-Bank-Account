@@ -9,7 +9,7 @@ import com.kata.bank.account.model.domain.Account;
 
 @Repository
 public interface AccountRepository extends CrudRepository<Account, Long> {
-	
+
 	Optional<Account> findByAccountNumber(Long accountNumber);
 
 }

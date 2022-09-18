@@ -1,6 +1,5 @@
 package com.kata.bank.account.model.domain;
 
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,21 +15,21 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class Client {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "client_id")
 	private Long clientId;
-	
+
 	@Column(name = "client_number", unique = true, nullable = false)
 	private Long clientNumber;
-	
+
 	private String firstname;
-	
+
 	private String lastname;
-	
+
 	private String email;
-	
+
 	public Client() {
 		super();
 	}
@@ -43,9 +42,4 @@ public class Client {
 		this.email = email;
 	}
 
-
-
-	
-	
-	
 }

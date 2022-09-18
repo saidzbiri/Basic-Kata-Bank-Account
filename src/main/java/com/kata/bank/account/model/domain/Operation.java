@@ -20,23 +20,23 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class Operation {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long operationId;
-	
+
 	@Column(name = "operation_type")
 	private String operationType;
-	
+
 	private double amount;
-	
+
 	@Column(name = "operation_date")
 	private Date date;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id")
+	@JoinColumn(name = "account_id")
 	private Account account;
-	
+
 	public Operation() {
 		super();
 	}
@@ -48,16 +48,5 @@ public class Operation {
 		this.account = account;
 		this.date = new Date();
 	}
-
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
 
 }

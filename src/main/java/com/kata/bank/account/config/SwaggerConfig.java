@@ -16,30 +16,27 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
-	
+
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
-        		.apiInfo(apiInfo())
+                .apiInfo(apiInfo())
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.kata.bank.account.controller"))
                 .paths(PathSelectors.any())
                 .build();
     }
-    
 
-	
-	
     private ApiInfo apiInfo() {
         return new ApiInfo(
-          "My REST API",
-          "Bank account kata API.",
-          "1.0",
-          "Terms of service",
-          new Contact("Said ZBIRI", "", "zbirisaid95@gmail.com"),
-          "License of API",
-          "API license URL",
-          Collections.emptyList());
+                "My REST API",
+                "Bank account kata API.",
+                "1.0",
+                "Terms of service",
+                new Contact("Said ZBIRI", "", "zbirisaid95@gmail.com"),
+                "License of API",
+                "API license URL",
+                Collections.emptyList());
     }
 
 }

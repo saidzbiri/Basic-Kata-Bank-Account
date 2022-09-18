@@ -12,15 +12,15 @@ public class OperationResourceAssembler extends ResourceAssemblerSupport<Operati
     public OperationResourceAssembler() {
         super(OperationController.class, OperationResource.class);
     }
-    
+
     @Override
     public OperationResource instantiateResource(OperationDto operation) {
         return new OperationResource(operation);
     }
 
-	@Override
-	public OperationResource toResource(OperationDto operation) {
-		return createResourceWithId(operation.getId(), operation);
-	}
+    @Override
+    public OperationResource toResource(OperationDto operation) {
+        return createResourceWithId(operation.getId(), operation);
+    }
 
 }
