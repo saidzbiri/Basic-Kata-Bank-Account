@@ -11,23 +11,18 @@ import com.kata.bank.account.service.AccountService;
 
 @Service
 public class AccountServiceImpl implements AccountService {
-	
-		
-	@Autowired
-    private AccountRepository accountRepository;
 
-	
+	@Autowired
+	private AccountRepository accountRepository;
+
 	@Override
-    public Account saveAccount(Account account) {
-        return accountRepository.save(account);
-    }
+	public Account saveAccount(Account account) {
+		return accountRepository.save(account);
+	}
 
 	@Override
 	public Optional<Account> findByAccountNumber(Long accountNumber) {
 		return accountRepository.findByAccountNumber(accountNumber);
 	}
 
-
-
-	
 }

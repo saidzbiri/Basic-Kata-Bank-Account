@@ -9,7 +9,7 @@ import com.kata.bank.account.service.ClientService;
 
 @Service
 public class ClientServiceImpl implements ClientService {
-	
+
 	@Autowired
 	private ClientRepository clientRepository;
 
