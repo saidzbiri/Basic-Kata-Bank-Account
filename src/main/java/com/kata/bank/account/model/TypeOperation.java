@@ -1,4 +1,4 @@
-package com.kata.bank.account.model.domain;
+package com.kata.bank.account.model;
 
 public enum TypeOperation {
 
