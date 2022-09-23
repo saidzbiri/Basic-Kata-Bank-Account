@@ -43,12 +43,33 @@ When the API is running, an embedded Apache Tomcat Server will be running at :
 ```text
     http://localhost:8080/
 ```  
+First of all, you need to get a user token with your credentials (usernameOrEmail: szbiri, password: 2022)
+
+With CURL :
+```text
+curl -X POST \
+  http://localhost:8080/api/auth/signin \
+  -H 'Content-Type: application/json' \
+  -H 'cache-control: no-cache' \
+  -d '{"usernameOrEmail":"szbiri", "password":"2022"} '
+```  
+
+Then you are able to make POST and GET request on the bank-account-api with an Authorization Bearer and the user token.
 
 You can make GET Request at this URL in order to print account statement (testing account is 123):  
 
 ```text
     http://localhost:8080/accounts/123
 ```  
+
+With CURL :  
+
+```CURL
+    curl -X GET \
+      'http://localhost:8080/accounts/123' \
+      -H "accept: */*" \
+      -H 'Authorization: Bearer  eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjYzOTc1NTI0LCJleHAiOjE2NjQ1ODAzMjR9.IgKsGjT4zrN0V3Ko-VOBDGzhdPau8X8OmHMhrgcVGCeLSeBl1b61BtLFQo-qCirL9_Vp_ZVW1ZXb1u8dNC5yZQ'
+``` 
 
 You can make POST Request at this URL in order to make a deposit or a withdrawal (testing account is 123):  
 
