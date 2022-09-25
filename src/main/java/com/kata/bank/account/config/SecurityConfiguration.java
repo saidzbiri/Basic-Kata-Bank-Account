@@ -51,7 +51,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 
 		String[] patterns = new String[] { "/v2/api-docs/**", "/swagger.json", "/swagger-resources/**",
-				"/swagger-ui.html", "/api/auth/**" };
+				"/swagger-ui.html", "/auth/**", "/webjars/**" };
 
 		http.cors().and().csrf().disable().exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()

@@ -18,7 +18,7 @@ import com.kata.bank.account.model.LoginRequest;
 import com.kata.bank.account.security.JwtTokenProvider;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 public class AuthController {
 
 	@Autowired

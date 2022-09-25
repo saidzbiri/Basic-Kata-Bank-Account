@@ -12,6 +12,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.Mockito.*;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+
 import com.kata.bank.account.Application;
 import com.kata.bank.account.model.domain.Account;
 import com.kata.bank.account.model.domain.Client;
@@ -22,6 +24,7 @@ import com.kata.bank.account.service.OperationService;
 
 import net.minidev.json.JSONValue;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -40,10 +43,12 @@ public class OperationControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    private static final String CLIENT_NAME = "szbiri";
     private Client client = new Client(4545L, "said", "zbiri", "said@gmail.com");
     private static final Long ACCOUNT_NUMBER = 1001L;
     private static final String OPERATION_TYPE = "Deposit";
 
+    @WithMockUser(value = CLIENT_NAME)
     @Test
     public void should_execute_operation() throws Exception {
         Account account = new Account(ACCOUNT_NUMBER, 50L, client);
@@ -61,16 +66,19 @@ public class OperationControllerTest {
         String json = JSONValue.toJSONString(operationRequest);
 
         this.mockMvc.perform(post("/operations/")
+                .with(csrf())
                 .content(json)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isCreated());
     }
 
+    @WithMockUser(value = CLIENT_NAME)
     @Test
     public void should_not_execute_operation_with_invalid_arguments() throws Exception {
         String json = "{\"accountNumber\":\"" + ACCOUNT_NUMBER + "\"}";
         this.mockMvc.perform(post("/operations/")
+                .with(csrf())
                 .content(json)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
