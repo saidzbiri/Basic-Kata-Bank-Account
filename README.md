@@ -1,6 +1,6 @@
 # Basic Kata Bank Account
 
-This project was created with Spring Boot, use an embedded database (h2) and Swagger.
+This project was created with Spring Boot, use an embedded database (h2) and Swagger tool.
 
 ## Author
 
